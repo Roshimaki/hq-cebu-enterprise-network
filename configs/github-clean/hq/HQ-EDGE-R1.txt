@@ -1,0 +1,156 @@
+HQ-EDGE-R1#sh running-config 
+Building configuration...
+
+Current configuration : 2659 bytes
+!
+version 15.4
+service timestamps log datetime msec
+service timestamps debug datetime msec
+no service password-encryption
+!
+hostname HQ-EDGE-R1
+!
+!
+!
+!
+!
+clock timezone PHT 8
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+username netadmin privilege 15 secret 5 REDACTED
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 2
+!
+crypto isakmp key PRE-SHARED-KEY address 203.0.113.5
+!
+!
+!
+crypto ipsec transform-set TSET1 esp-aes esp-sha-hmac
+!
+crypto map CMAP1 10 ipsec-isakmp 
+ set peer 203.0.113.5
+ set transform-set TSET1 
+ match address 100
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+ip domain-name hq.local
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 1.1.1.21 255.255.255.255
+!
+interface Tunnel0
+ ip address 172.16.1.1 255.255.255.252
+ mtu 1476
+ tunnel source GigabitEthernet0/0/2
+ tunnel destination 203.0.113.5
+!
+!
+interface GigabitEthernet0/0/0
+ ip address 10.7.1.2 255.255.255.252
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0/1
+ ip address 10.7.2.2 255.255.255.252
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0/2
+ ip address 203.0.113.1 255.255.255.252
+ ip nat outside
+ crypto map CMAP1
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 1.1.1.21
+ log-adjacency-changes
+ redistribute static subnets 
+ network 172.16.1.0 0.0.0.3 area 0
+ network 10.7.1.0 0.0.0.3 area 0
+ network 10.7.2.0 0.0.0.3 area 0
+ network 1.1.1.21 0.0.0.0 area 0
+ default-information originate
+!
+ip nat inside source list NAT-INSIDE interface GigabitEthernet0/0/2 overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 203.0.113.2 
+!
+ip flow-export version 9
+!
+!
+access-list 100 permit gre host 203.0.113.1 host 203.0.113.5
+ip access-list standard SSH-ALLOW
+ permit 192.168.40.0 0.0.0.31
+ deny any
+ip access-list extended NAT-INSIDE
+ deny ip any 10.0.0.0 0.255.255.255
+ deny ip any 172.16.0.0 0.15.255.255
+ deny ip any 192.168.0.0 0.0.255.255
+ permit ip 192.168.20.0 0.0.0.63 any
+ permit ip 192.168.30.0 0.0.0.15 any
+ permit ip 192.168.40.0 0.0.0.31 any
+ permit ip 192.168.60.0 0.0.0.31 any
+ permit ip 192.168.70.0 0.0.0.63 any
+ permit ip 192.168.90.0 0.0.0.63 any
+ permit ip 192.168.100.0 0.0.0.63 any
+ permit ip 192.168.110.0 0.0.0.63 any
+!
+!
+!
+!
+snmp-server community <COMMUNITY> RO
+!
+logging trap debugging
+logging 192.168.50.4
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ access-class SSH-ALLOW in
+ login local
+ transport input ssh
+line vty 5 15
+ access-class SSH-ALLOW in
+ login local
+ transport input ssh
+!
+!
+ntp authentication-key 1 md5 REDACTED 7
+ntp authenticate
+ntp trusted-key 1
+ntp server 192.168.50.4 key 1
+!
+end
+
+
+HQ-EDGE-R1#
