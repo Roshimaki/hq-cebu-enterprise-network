@@ -131,13 +131,13 @@ Each distribution pair and its access switches share one /29, so each failure do
 
 - **OSPF process 1, area 0** on all core and distribution switches. Router ID equals the loopback address.
 - VLAN 900 SVIs are `passive-interface`.
-- **Path selection:** OSPF picks the lowest-cost path. Equal-cost paths are load-shared (ECMP). Cost can be tuned per interface with `ip ospf cost`, either to prefer one path and keep the other for failover, or to balance traffic.
+- **Path selection:** OSPF selects routes based on their total cost. When multiple equal-cost routes are installed, ECMP can allow traffic to use both paths. Interface costs can be adjusted with ip ospf cost to influence route selection. This lab aims to use both WAN paths rather than designate one as the primary path and the other as a standby.
 - **Internal routing:** OSPF only. No internal link advertises ISP addressing.
 - **ISP side:** BGP would normally be used between customer edges and providers, but it was out of scope for this project. ISP1, ISP2 and INTERNET use **static routes** instead: each ISP routes toward INTERNET, and INTERNET routes back to each ISP.
 
 ### WAN and internet design
 
-Two independent paths, one through each ISP, so either path can fail without isolating a site.
+Two WAN paths connect HQ and Cebu through separate ISP routers. Both paths are intended to remain available for inter-site communication. OSPF determines route selection based on cost, and the network is designed to retain connectivity if one path becomes unavailable, provided the remaining path and its routes are operational.
 
 | Link | Subnet | End A | End B |
 |---|---|---|---|
@@ -156,7 +156,7 @@ Two independent paths, one through each ISP, so either path can fail without iso
 
 The 203.0.113.0/24 and 198.51.100.0/24 ranges are reserved for documentation (RFC 5737), so they are safe to use as simulated public addressing.
 
-- **Inter-site:** OSPF runs over both GRE tunnels. With equal costs, traffic is load-shared across both. Raising the cost on one tunnel makes it a backup instead.
+- **Inter-site:** OSPF runs over both GRE over IPsec tunnels. Equal-cost routes may enable ECMP across both tunnels. If one tunnel becomes unavailable, OSPF can reconverge through the remaining tunnel, subject to route availability and successful failover testing.
 - **Internet:** PAT on the edge routers, so internal hosts reach 8.8.8.8 through whichever ISP path is active.
 - **Note on GRE:** each edge must reach the other site's public (ISP-facing) address through its static/default route, not through the tunnel. Otherwise the tunnel's own traffic would try to route through itself and the tunnel would flap.
 
