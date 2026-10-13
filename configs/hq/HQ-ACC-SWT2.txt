@@ -1,0 +1,196 @@
+HQ-ACC-SWT2#sh running-config 
+Building configuration...
+
+Current configuration : 4597 bytes
+!
+version 15.0
+service timestamps log datetime msec
+service timestamps debug datetime msec
+no service password-encryption
+!
+hostname HQ-ACC-SWT2
+!
+!
+!
+clock timezone PHT 8
+!
+ip ssh version 2
+ip domain-name hq.local
+!
+username netadmin secret 5 $1$mERr$D9MBCwZtHCl8Rzlj6rsez0
+!
+!
+ip dhcp snooping vlan 30,40
+no ip dhcp snooping information option
+ip dhcp snooping
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+ switchport access vlan 30
+ ip dhcp snooping limit rate 6
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 6
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0006.2A92.4499
+ switchport port-security mac-address sticky 000C.85A2.B50B
+ switchport port-security mac-address sticky 0060.2FC1.E645
+ switchport port-security mac-address sticky 0090.212C.C59D
+ switchport port-security mac-address sticky 00E0.B08B.2BA5
+ switchport port-security mac-address sticky 00E0.F764.715E
+!
+interface FastEthernet0/2
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0005.5E08.EDC3
+!
+interface FastEthernet0/3
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0009.7C18.B1EB
+!
+interface FastEthernet0/4
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0001.C77E.54CD
+!
+interface FastEthernet0/5
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0090.2B21.9300
+!
+interface FastEthernet0/6
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 00E0.B077.6453
+!
+interface FastEthernet0/7
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0060.701B.2EB8
+!
+interface FastEthernet0/8
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0040.0B91.17E2
+!
+interface FastEthernet0/9
+ switchport access vlan 40
+ ip dhcp snooping limit rate 3
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security violation restrict 
+ switchport port-security mac-address sticky 0002.4A23.C3AD
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 30,40,99,900
+ ip dhcp snooping trust
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 30,40,99,900
+ ip dhcp snooping trust
+ switchport mode trunk
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan900
+ ip address 192.168.99.5 255.255.255.248
+!
+ip default-gateway 192.168.99.1
+!
+logging trap debugging
+logging 192.168.50.4
+!
+!
+!
+ip access-list standard SSH-ALLOW
+ permit 192.168.40.0 0.0.0.31
+ deny any
+line con 0
+!
+line vty 0 4
+ access-class SSH-ALLOW in
+ login local
+ transport input ssh
+line vty 5 15
+ access-class SSH-ALLOW in
+ login local
+ transport input ssh
+!
+!
+!
+ntp authenticate
+ntp trusted-key 1
+ntp server 192.168.50.4 key 1
+!
+end
+
+
+HQ-ACC-SWT2#

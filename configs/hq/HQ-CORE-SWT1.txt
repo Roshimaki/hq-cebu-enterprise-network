@@ -1,0 +1,224 @@
+
+HQ-CORE-SWT1#sh running-config 
+Building configuration...
+
+Current configuration : 3315 bytes
+!
+version 16.3.2
+service timestamps log datetime msec
+service timestamps debug datetime msec
+no service password-encryption
+!
+hostname HQ-CORE-SWT1
+!
+!
+no profinet
+!
+!
+!
+clock timezone PHT 8
+!
+!
+!
+!
+no ip cef
+ip routing
+!
+no ipv6 cef
+!
+!
+!
+username netadmin privilege 15 secret 5 $1$mERr$DrMHUDTlYVNlz7tgdp6SB1
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+ip domain-name hq.local
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 1.1.1.1 255.255.255.255
+!
+interface Tunnel0
+ no ip address
+ mtu 1476
+!
+!
+interface Port-channel2
+ no switchport
+ ip address 10.0.0.1 255.255.255.252
+!
+interface GigabitEthernet1/0/1
+ no switchport
+ ip address 10.1.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/2
+ no switchport
+ ip address 10.2.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/3
+ no switchport
+ ip address 10.3.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/4
+ no switchport
+ ip address 10.4.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/5
+ no switchport
+ ip address 10.5.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/6
+ no switchport
+ ip address 10.6.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/7
+ no switchport
+ no ip address
+ channel-group 2 mode active
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/8
+ no switchport
+ no ip address
+ channel-group 2 mode active
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/9
+ no switchport
+ no ip address
+ channel-group 2 mode active
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/10
+!
+interface GigabitEthernet1/0/11
+!
+interface GigabitEthernet1/0/12
+!
+interface GigabitEthernet1/0/13
+!
+interface GigabitEthernet1/0/14
+!
+interface GigabitEthernet1/0/15
+!
+interface GigabitEthernet1/0/16
+!
+interface GigabitEthernet1/0/17
+!
+interface GigabitEthernet1/0/18
+!
+interface GigabitEthernet1/0/19
+!
+interface GigabitEthernet1/0/20
+!
+interface GigabitEthernet1/0/21
+!
+interface GigabitEthernet1/0/22
+!
+interface GigabitEthernet1/0/23
+ no switchport
+ ip address 10.7.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/0/24
+ no switchport
+ ip address 10.8.1.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet1/1/1
+!
+interface GigabitEthernet1/1/2
+!
+interface GigabitEthernet1/1/3
+!
+interface GigabitEthernet1/1/4
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 1.1.1.1
+ log-adjacency-changes
+ network 10.0.0.0 0.0.0.3 area 0
+ network 10.1.1.0 0.0.0.3 area 0
+ network 10.2.1.0 0.0.0.3 area 0
+ network 10.3.1.0 0.0.0.3 area 0
+ network 10.4.1.0 0.0.0.3 area 0
+ network 10.5.1.0 0.0.0.3 area 0
+ network 10.6.1.0 0.0.0.3 area 0
+ network 10.7.1.0 0.0.0.3 area 0
+ network 10.8.1.0 0.0.0.3 area 0
+ network 1.1.1.1 0.0.0.0 area 0
+!
+ip classless
+!
+ip flow-export version 9
+!
+!
+ip access-list standard SSH-ALLOW
+ permit 192.168.40.0 0.0.0.31
+ deny any
+!
+!
+!
+!
+!
+logging trap debugging
+logging 192.168.50.4
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ access-class SSH-ALLOW in
+ login local
+ transport input ssh
+line vty 5 15
+ access-class SSH-ALLOW in
+ login local
+ transport input ssh
+!
+!
+!
+ntp authentication-key 1 md5 080F787E36290404011C03162E 7
+ntp authenticate
+ntp trusted-key 1
+ntp server 192.168.50.4 key 1
+!
+end
+
+
+HQ-CORE-SWT1#
