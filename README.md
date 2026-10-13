@@ -154,6 +154,13 @@ Two WAN paths connect HQ and Cebu through separate ISP routers. Both paths are i
 | Tunnel via ISP1 (GRE + IPsec) | 172.16.1.0/30 | .1 HQ-EDGE-R1, .2 CEBU-EDGE-R1 |
 | Tunnel via ISP2 (GRE + IPsec) | 172.16.2.0/30 | .1 HQ-EDGE-R2, .2 CEBU-EDGE-R2 |
 
+| Device | Destination | Next hop | Purpose |
+|---|---|---|---|
+| ISP1 | `0.0.0.0/0` | `198.51.100.2` | Forward unknown destinations toward INTERNET |
+| ISP2 | `0.0.0.0/0` | `198.51.100.6` | Forward unknown destinations toward INTERNET |
+| INTERNET | `203.0.113.0/29` | `198.51.100.1` | Route toward the ISP1-connected WAN networks |
+| INTERNET | `203.0.113.8/29` | `198.51.100.5` | Route toward the ISP2-connected WAN networks |
+
 The 203.0.113.0/24 and 198.51.100.0/24 ranges are reserved for documentation (RFC 5737), so they are safe to use as simulated public addressing.
 
 - **Inter-site:** OSPF runs over both GRE over IPsec tunnels. Equal-cost routes may enable ECMP across both tunnels. If one tunnel becomes unavailable, OSPF can reconverge through the remaining tunnel, subject to route availability and successful failover testing.
@@ -165,7 +172,7 @@ The 203.0.113.0/24 and 198.51.100.0/24 ranges are reserved for documentation (RF
 - Each tunnel is a GRE interface (`Tunnel0`) between the two edge routers' ISP-facing addresses. IPsec protects the GRE packets: a crypto map on the ISP-facing interface matches GRE traffic between the two public endpoints (ACL 100).
 - **ISAKMP (phase 1):** AES, pre-shared key authentication, Diffie-Hellman group 2. **IPsec (phase 2):** transform set ESP-AES + ESP-SHA-HMAC. Each path has its own key (not published, see the note in section 11).
 - OSPF runs over the tunnel (172.16.x.0/30). Each edge router has a static default route to its ISP and advertises it into OSPF (`default-information originate`), so internal routers learn two equal-cost default paths.
-- **PAT:** the `NAT-INSIDE` ACL translates the CEBU Guest (220), IT (230) and Sales (250) subnets to the ISP-facing address (`overload`). Traffic to internal ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) is never translated, so inter-site traffic keeps its real addresses. TODO: Management (210) is not in this list, so add it if it should reach the internet.
+- **PAT:** The NAT-INSIDE ACL translates eligible internal subnets to the ISP-facing address using overload, allowing regular user VLANs to access the Internet. Voice VLANs (HQ VLAN 80 and Cebu VLAN 240) and Management VLANs (HQ VLAN 10 and Cebu VLAN 210) are excluded from the intended general Internet-access policy. Traffic destined for internal RFC 1918 address ranges is excluded from NAT so inter-site traffic retains its original addresses.
 
 | Item | CEBU-EDGE-R1 | CEBU-EDGE-R2 |
 |---|---|---|
@@ -176,7 +183,14 @@ The 203.0.113.0/24 and 198.51.100.0/24 ranges are reserved for documentation (RF
 | Tunnel0 | 172.16.1.2/30 to 203.0.113.1 (HQ-EDGE-R1) | 172.16.2.2/30 to 203.0.113.9 (HQ-EDGE-R2) |
 | IPsec | Transform set TSET1, crypto map CMAP1 | Transform set TSET2, crypto map CMAP2 |
 
-> 📝 **TODO:** add the HQ edge router configs (the mirror of the table above) and the ISP1, ISP2 and INTERNET static routes.
+| Item | HQ-EDGE-R1 | HQ-EDGE-R2 |
+|---|---|---|
+| Loopback (router ID) | `1.1.1.21/32` | `1.1.1.22/32` |
+| Links to core | Gi0/0/0 — `10.7.1.2/30`; Gi0/0/1 — `10.7.2.2/30` | Gi0/0/0 — `10.8.1.2/30`; Gi0/0/1 — `10.8.2.2/30` |
+| ISP link | Gi0/0/2 — `203.0.113.1/30` to ISP1 (`203.0.113.2`) | Gi0/0/2 — `203.0.113.9/30` to ISP2 (`203.0.113.10`) |
+| Default route | `0.0.0.0/0` via `203.0.113.2` | `0.0.0.0/0` via `203.0.113.10` |
+| Tunnel0 | `172.16.1.1/30` to `203.0.113.5` (CEBU-EDGE-R1) | `172.16.2.1/30` to `203.0.113.13` (CEBU-EDGE-R2) |
+| IPsec | Crypto map `CMAP1`; peer `203.0.113.5` | Crypto map `CMAP2`; peer `203.0.113.13` |
 
 ---
 
