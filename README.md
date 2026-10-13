@@ -43,9 +43,6 @@ graph TD
     CCORE --- CDIST[CEBU-DIST-SWT1 / SWT2]
     CDIST --- CACC[CEBU-ACC-SWT1 / SWT2]
 ```
-
-> 📝 **TODO:** replace this with an exported Packet Tracer screenshot in `docs/images/topology.png`.
-
 ---
 
 ## 2. Naming convention
@@ -315,9 +312,9 @@ CEBU follows the same model for its VLANs. Between sites: HQ IT can manage every
 | HSRP state | One Active and one Standby per VLAN | ✅ | `docs/images/hsrp-standby-brief-*.png` |
 | HSRP failover | Gateway stays reachable when the active switch fails | Not tested | n/a |
 | SSH from IT | Login succeeds | ✅ | `docs/images/ssh-it.png` |
-| SSH from non-IT VLAN | Refused | TODO | `docs/images/ssh-denied.png` |
+| SSH from non-IT VLAN | Refused | ✅ | `docs/images/ssh-denied.png` |
 | Guest isolation | Guest reaches internet, not internal VLANs | ✅ | `docs/images/guest-acl-*.png` |
-| Inter-VLAN ACL policy | Ping matrix per VLAN as listed in `docs/acl-policy.md` | TODO | `docs/images/acl-*.png` |
+| Inter-VLAN ACL policy | Ping matrix per VLAN as listed in `docs/acl-policy.md` | ✅ | `docs/images/acl-*.png` |
 | HQ ↔ CEBU over tunnel | Ping succeeds | ✅ | `docs/images/tunnel-ping.png` |
 | PAT to internet | Internal host reaches 8.8.8.8 | ✅ | `docs/images/pat-*.png` |
 
@@ -359,4 +356,3 @@ CEBU follows the same model for its VLANs. Between sites: HQ IT can manage every
 └── network.pkt            # Packet Tracer file
 ```
 
-> 🔒 **Before committing configs:** run `python3 scripts/sanitize_config.py <input> <output>` to redact password hashes, NTP keys, IPsec pre-shared keys, SNMP community strings and serial numbers, then review the result by hand.
